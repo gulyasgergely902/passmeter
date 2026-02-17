@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
@@ -18,11 +19,20 @@ struct ContentView: View {
             List {
                 ForEach(items) { item in
                     HStack(spacing: 20) {
-                        ProgressArch(
-                            progress: item.progressRatio,
-                            color: item.statusDisplay.progressColor
-                        )
-                        
+                        ZStack {
+                            Circle()
+                                .stroke(Color.secondary.opacity(0.2), lineWidth: 12)
+
+                            Circle()
+                                .trim(from: 0, to: item.progressRatio)
+                                .stroke(
+                                    item.statusDisplay.progressColor,
+                                    style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                                )
+                                .rotationEffect(.degrees(-90))
+                        }
+                        .frame(width: 45, height: 45)
+
                         VStack(alignment: .leading) {
                             Text(item.title)
                                 .font(.headline)
@@ -84,6 +94,13 @@ struct ContentView: View {
             )
             modelContext.insert(newItem)
             NotificationManager.instance.scheduleNotification(for: newItem)
+
+            do {
+                try modelContext.save()
+                WidgetCenter.shared.reloadAllTimelines()
+            } catch {
+                print("Failed to save pass: \(error)")
+            }
         }
     }
 
@@ -93,6 +110,7 @@ struct ContentView: View {
                 let item = items[index]
                 NotificationManager.instance.cancelNotification(for: item)
                 modelContext.delete(item)
+                WidgetCenter.shared.reloadAllTimelines()
             }
         }
     }

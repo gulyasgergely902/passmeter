@@ -12,17 +12,19 @@ import UserNotifications
 @main
 struct PassMeterApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+            let groupID = "group.com.gergelygulyas.PassMeter"
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+            let url = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: groupID)!
+                .appendingPathComponent("PassMeter.sqlite")
+
+            let config = ModelConfiguration(url: url)
+
+            do {
+                return try ModelContainer(for: Item.self, configurations: config)
+            } catch {
+                fatalError("Could not create ModelContainer: \(error)")
+            }
+        }()
 
     var body: some Scene {
         WindowGroup {

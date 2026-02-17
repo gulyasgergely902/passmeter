@@ -65,7 +65,7 @@ final class Item {
         let days = daysRemaining
         let _textColor: Color = days <= 3 ? .red : (days <= 7 ? .yellow : .gray)
         let _progressColor: Color = days <= 3 ? .red : (days <= 7 ? .yellow : .blue)
-        let _statusText = expiryDate.formatted(.relative(presentation: .numeric))
+        let _statusText = "Expires \(expiryDate.formatted(.relative(presentation: .numeric)))."
 
         return (statusText: _statusText, progressColor: _progressColor, textColor: _textColor)
     }
