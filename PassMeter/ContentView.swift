@@ -18,16 +18,26 @@ struct ContentView: View {
             List {
                 ForEach(items) { item in
                     HStack(spacing: 20) {
-                        // Our new custom progress bar
-                        ProgressArch(progress: item.progressRatio, color: item.statusColor)
+                        ProgressArch(
+                            progress: item.progressRatio,
+                            color: item.statusDisplay.progressColor
+                        )
                         
                         VStack(alignment: .leading) {
                             Text(item.title)
                                 .font(.headline)
-                            Text("Expires in \(Calendar.current.dateComponents([.day], from: .now, to: item.expiryDate).day ?? 0) days")
+
+                            Text(item.expiryDate.formatted(date: .abbreviated, time: .omitted))
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
+
+                            Text(item.statusDisplay.statusText)
+                                .foregroundColor(item.statusDisplay.textColor)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
+
+                        Spacer()
                     }
                     .padding(.vertical, 4)
                 }
@@ -38,33 +48,51 @@ struct ContentView: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     EditButton()
                 }
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        isShowingAddModal = true
+                ToolbarItemGroup(placement: .topBarTrailing) {
+                    NavigationLink {
+                        SettingsView()
                     } label: {
-                        Label("Add Item", systemImage: "plus")
+                        Image(systemName: "gearshape")
+                    }
+
+                    Button(action: { isShowingAddModal = true }) {
+                        Image(systemName: "plus")
                     }
                 }
             }
             .sheet(isPresented: $isShowingAddModal) {
-                AddReminderView { title, totalDays, expiryDate in
-                    addItem(title: title, totalDays: totalDays, expiryDate: expiryDate)
+                AddReminderView { title, start, end in
+                    addItem(
+                        title: title,
+                        startDate: start,
+                        expiryDate: end
+                    )
                 }
+            }
+            .onAppear {
+                NotificationManager.instance.requestAuthorization()
             }
         }
     }
 
-    private func addItem(title: String, totalDays: Int, expiryDate: Date) {
+    private func addItem(title: String, startDate: Date, expiryDate: Date) {
         withAnimation {
-            let newItem = Item(title: title, expiryDate: expiryDate, totalDays: totalDays)
+            let newItem = Item(
+                title: title,
+                startDate: startDate,
+                expiryDate: expiryDate
+            )
             modelContext.insert(newItem)
+            NotificationManager.instance.scheduleNotification(for: newItem)
         }
     }
 
     private func deleteItems(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(items[index])
+                let item = items[index]
+                NotificationManager.instance.cancelNotification(for: item)
+                modelContext.delete(item)
             }
         }
     }
