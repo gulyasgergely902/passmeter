@@ -19,6 +19,9 @@ struct WidgetItem: Identifiable {
     let progressColor: Color
     let statusText: String
     let textColor: Color
+    let hasEntryLimit: Bool
+    let entryProgress: Double
+    let entryProgressColor: Color
 }
 
 struct WidgetItemsList: TimelineEntry {
@@ -34,7 +37,10 @@ let mockWidget = WidgetItem(
     isExpired: false,
     progressColor: .gray,
     statusText: "N/A",
-    textColor: .gray
+    textColor: .gray,
+    hasEntryLimit: false,
+    entryProgress: 0.0,
+    entryProgressColor: .gray
 )
 
 struct Provider: TimelineProvider {
@@ -54,19 +60,27 @@ struct Provider: TimelineProvider {
 
         do {
             let container = try ModelContainer(for: Item.self, configurations: config)
+
+            let context = container.mainContext
+            context.container.mainContext.rollback()
+            context.undoManager = nil // Optional: disables some tracking to save memory
+
             let descriptor = FetchDescriptor<Item>(sortBy: [SortDescriptor(\.expiryDate)])
-            let allItems = try container.mainContext.fetch(descriptor)
+            let allItems = try context.fetch(descriptor)
 
             return allItems.prefix(2).map { item in
                 WidgetItem(
                     date: .now,
                     title: item.title,
                     expiryDate: item.expiryDate,
-                    progress: item.progressRatio,
+                    progress: item.progressRatio.dateProgressRatio,
                     isExpired: item.isExpired,
                     progressColor: item.statusDisplay.progressColor,
                     statusText: item.statusDisplay.statusText,
-                    textColor: item.statusDisplay.textColor
+                    textColor: item.statusDisplay.textColor,
+                    hasEntryLimit: item.hasEntryLimit,
+                    entryProgress: item.progressRatio.entryProgressRatio,
+                    entryProgressColor: item.entryCountProgressColor
                 )
             }
         } catch {
@@ -83,7 +97,10 @@ struct Provider: TimelineProvider {
             isExpired: false,
             progressColor: .blue,
             statusText: "Sample Status",
-            textColor: .blue
+            textColor: .blue,
+            hasEntryLimit: true,
+            entryProgress: 40.0,
+            entryProgressColor: .green
         )
         return WidgetItemsList(
             date: .now,
@@ -117,7 +134,7 @@ struct SmallWidgetView: View {
     let item: WidgetItem
 
     var body: some View {
-        VStack{
+        VStack {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                 Text(item.title)
@@ -143,17 +160,31 @@ struct SmallWidgetView: View {
                 Text("")
                 Spacer()
                 ZStack {
-                Circle()
-                    .stroke(Color.secondary.opacity(0.2), lineWidth: 14)
+                    Circle()
+                        .stroke(Color.secondary.opacity(0.2), lineWidth: 14)
 
-                Circle()
-                    .trim(from: 0, to: item.progress)
-                    .stroke(
-                        item.progressColor,
-                        style: StrokeStyle(lineWidth: 14, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-            }
+                    Circle()
+                        .trim(from: 0, to: item.progress)
+                        .stroke(
+                            item.progressColor,
+                            style: StrokeStyle(lineWidth: 14, lineCap: .round)
+                        )
+                        .rotationEffect(.degrees(-90))
+                    if item.hasEntryLimit {
+                        Circle()
+                            .stroke(Color.secondary.opacity(0.2), lineWidth: 8)
+                            .padding(14)
+
+                        Circle()
+                            .trim(from: 0, to: item.entryProgress)
+                            .stroke(
+                                item.entryProgressColor,
+                                style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                            )
+                            .padding(14)
+                            .rotationEffect(.degrees(-90))
+                    }
+                }
             .frame(width: 55, height: 55)
             }
         }.containerBackground(.fill.tertiary, for: .widget)
@@ -164,9 +195,11 @@ struct MediumWidgetView: View {
     let items: [WidgetItem]
 
     var body: some View {
-        VStack {
-            ForEach(Array(zip(items.indices, items)), id: \.1.id) { index, item in
-                HStack {
+        VStack(spacing: 10) {
+            ForEach(0..<items.count, id: \.self) { index in
+                let item = items[index]
+
+                HStack(alignment: .center, spacing: 20) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(item.title)
                             .font(.system(.headline, design: .rounded))
@@ -196,6 +229,20 @@ struct MediumWidgetView: View {
                                 style: StrokeStyle(lineWidth: 12, lineCap: .round)
                             )
                             .rotationEffect(.degrees(-90))
+                        if item.hasEntryLimit {
+                            Circle()
+                                .stroke(Color.secondary.opacity(0.2), lineWidth: 8)
+                                .padding(14)
+
+                            Circle()
+                                .trim(from: 0, to: item.entryProgress)
+                                .stroke(
+                                    item.entryProgressColor,
+                                    style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                                )
+                                .padding(14)
+                                .rotationEffect(.degrees(-90))
+                        }
                     }
                     .frame(width: 40, height: 40)
                 }
@@ -205,7 +252,8 @@ struct MediumWidgetView: View {
                         .padding(.leading, 16)
                 }
             }
-        }.containerBackground(.fill.tertiary, for: .widget)
+        }
+        .containerBackground(.fill.tertiary, for: .widget)
     }
 }
 

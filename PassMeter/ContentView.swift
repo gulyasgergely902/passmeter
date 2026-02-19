@@ -13,6 +13,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [Item]
     @State private var isShowingAddModal = false
+    @State private var selectedItem: Item?
 
     var body: some View {
         NavigationStack {
@@ -24,12 +25,26 @@ struct ContentView: View {
                                 .stroke(Color.secondary.opacity(0.2), lineWidth: 12)
 
                             Circle()
-                                .trim(from: 0, to: item.progressRatio)
+                                .trim(from: 0, to: item.progressRatio.dateProgressRatio)
                                 .stroke(
                                     item.statusDisplay.progressColor,
                                     style: StrokeStyle(lineWidth: 12, lineCap: .round)
                                 )
                                 .rotationEffect(.degrees(-90))
+                            if item.hasEntryLimit {
+                                Circle()
+                                    .stroke(Color.secondary.opacity(0.2), lineWidth: 8)
+                                    .padding(14)
+
+                                Circle()
+                                    .trim(from: 0, to: item.progressRatio.entryProgressRatio)
+                                    .stroke(
+                                        item.entryCountProgressColor,
+                                        style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                                    )
+                                    .padding(14)
+                                    .rotationEffect(.degrees(-90))
+                            }
                         }
                         .frame(width: 45, height: 45)
 
@@ -45,13 +60,48 @@ struct ContentView: View {
                                 .foregroundColor(item.statusDisplay.textColor)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
+                            if item.hasEntryLimit {
+                                Text("Remainin entries: \(item.remainingEntries)")
+                                    .foregroundColor(item.statusDisplay.textColor)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
 
                         Spacer()
+
+                        if item.hasEntryLimit && item.remainingEntries > 0 {
+                            Button {
+                                useEntry(for: item)
+                            } label: {
+                                Image(systemName: "ticket.fill")
+                                    .font(.title3)
+                                    .foregroundStyle(.green)
+                                    .padding(8)
+                                    .background(Color.green.opacity(0.1))
+                                    .clipShape(Circle())
+                            }
+                            .buttonStyle(.plain) // Prevents the whole row from highlighting
+                        }
                     }
                     .padding(.vertical, 4)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button {
+                            selectedItem = item
+                        } label: {
+                            Label("Renew", systemImage: "arrow.clockwise")
+                        }
+                        .tint(.yellow)
+
+                        Button {
+                            print("TAP DETECTED")
+                            deleteItems(item)
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                        .tint(.red)
+                    }
                 }
-                .onDelete(perform: deleteItems)
             }
             .navigationTitle("My Passes")
             .toolbar {
@@ -71,13 +121,19 @@ struct ContentView: View {
                 }
             }
             .sheet(isPresented: $isShowingAddModal) {
-                AddReminderView { title, start, end in
+                AddReminderView { title, start, expiry, hasEntryLimit, totalEntries in
                     addItem(
                         title: title,
                         startDate: start,
-                        expiryDate: end
+                        expiryDate: expiry,
+                        hasEntryLimit: hasEntryLimit,
+                        totalEntries: totalEntries
                     )
                 }
+            }
+            .sheet(item: $selectedItem) { itemToRenew in
+                RenewPassView(item: itemToRenew)
+                    .presentationDetents([.medium])
             }
             .onAppear {
                 NotificationManager.instance.requestAuthorization()
@@ -85,12 +141,15 @@ struct ContentView: View {
         }
     }
 
-    private func addItem(title: String, startDate: Date, expiryDate: Date) {
+    private func addItem(title: String, startDate: Date, expiryDate: Date, hasEntryLimit: Bool = false, totalEntries: Int = 0) {
+        print("AddItem")
         withAnimation {
             let newItem = Item(
                 title: title,
                 startDate: startDate,
-                expiryDate: expiryDate
+                expiryDate: expiryDate,
+                hasEntryLimit: hasEntryLimit,
+                totalEntries: totalEntries
             )
             modelContext.insert(newItem)
             NotificationManager.instance.scheduleNotification(for: newItem)
@@ -99,24 +158,35 @@ struct ContentView: View {
                 try modelContext.save()
                 WidgetCenter.shared.reloadAllTimelines()
             } catch {
-                print("Failed to save pass: \(error)")
+                print("Failed to add pass: \(error)")
             }
         }
     }
 
-    private func deleteItems(offsets: IndexSet) {
+    private func deleteItems(_ item: Item) {
+        print("DeleteItems")
         withAnimation {
-            for index in offsets {
-                let item = items[index]
-                NotificationManager.instance.cancelNotification(for: item)
-                modelContext.delete(item)
-                WidgetCenter.shared.reloadAllTimelines()
-            }
+            print("Disabling notifications for \(item.title)")
+            NotificationManager.instance.cancelNotification(for: item)
+            print("Deleting item")
+            modelContext.delete(item)
+            print("Force refreshing widget")
+            WidgetCenter.shared.reloadAllTimelines()
+            print("Done")
         }
     }
-}
 
-#Preview {
-    ContentView()
-        .modelContainer(for: Item.self, inMemory: true)
+    func useEntry(for item: Item) {
+        let impact = UIImpactFeedbackGenerator(style: .medium)
+        impact.impactOccurred()
+
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+            if item.remainingEntries > 0 {
+                item.remainingEntries -= 1
+            }
+        }
+
+        try? modelContext.save()
+        WidgetCenter.shared.reloadAllTimelines()
+    }
 }

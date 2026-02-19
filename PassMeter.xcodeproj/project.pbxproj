@@ -60,7 +60,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		E46B65AE2F44913A005F5C8A /* Exceptions for "PassMeterWidget" folder in "PassMeterWidgetExtension" target */ = {
+		E4245CAE2F4507AF008B432C /* Exceptions for "PassMeterWidget" folder in "PassMeterWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -80,7 +80,7 @@
 		E46B659C2F449138005F5C8A /* PassMeterWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				E46B65AE2F44913A005F5C8A /* Exceptions for "PassMeterWidget" folder in "PassMeterWidgetExtension" target */,
+				E4245CAE2F4507AF008B432C /* Exceptions for "PassMeterWidget" folder in "PassMeterWidgetExtension" target */,
 			);
 			path = PassMeterWidget;
 			sourceTree = "<group>";
@@ -581,6 +581,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = PassMeter/PassMeter.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -627,6 +628,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = PassMeter/PassMeter.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;

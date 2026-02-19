@@ -15,26 +15,40 @@ final class Item {
     var title: String
     var startDate: Date
     var expiryDate: Date
-    
-    init(title: String, startDate: Date, expiryDate: Date) {
+
+    var hasEntryLimit: Bool = false
+    var totalEntries: Int = 0
+    var remainingEntries: Int = 0
+
+    init(title: String, startDate: Date, expiryDate: Date, hasEntryLimit: Bool = false, totalEntries: Int = 0) {
         self.id = UUID()
         self.title = title
         self.startDate = startDate
         self.expiryDate = expiryDate
+        self.hasEntryLimit = hasEntryLimit
+        self.totalEntries = totalEntries
+        self.remainingEntries = totalEntries
     }
-    
-    var progressRatio: Double {
-        let now = Date()
-        let passDuration = expiryDate.timeIntervalSince(startDate)
-        let elapsedSinceStart = now.timeIntervalSince(startDate)
 
+    var progressRatio: (dateProgressRatio: Double, entryProgressRatio: Double) {
+        let passDuration = expiryDate.timeIntervalSince(startDate)
+        let elapsedSinceStart = Date().timeIntervalSince(startDate)
+
+        var dateProgress: Double = 0
         if elapsedSinceStart < 0 {
-            return 1.0
+            dateProgress = 1.0
         }
 
         let ratio = 1.0 - (elapsedSinceStart / passDuration)
+        dateProgress = max(0, min(1.0, ratio))
 
-        return max(0, min(1.0, ratio))
+        var entryProgress: Double = 0
+        if hasEntryLimit && totalEntries > 0 {
+            let usedEntries = totalEntries - remainingEntries
+            entryProgress = Double(totalEntries - usedEntries) / Double(totalEntries)
+        }
+
+        return (dateProgressRatio: dateProgress, entryProgressRatio: entryProgress)
     }
 
     var daysRemaining: Int {
@@ -44,12 +58,20 @@ final class Item {
         return calendar.dateComponents([.day], from: today, to: end).day ?? 0
     }
 
+    var isNearExpiry: Bool {
+        return daysRemaining <= 3 || (hasEntryLimit && remainingEntries <= 2)
+    }
+
     var isExpired: Bool {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: .now)
         let expiry = calendar.startOfDay(for: expiryDate)
 
-        return expiry < today
+        let basedOnTime = expiry < today
+
+        let basedOnEntryCount = (hasEntryLimit && remainingEntries <= 0)
+
+        return basedOnTime || basedOnEntryCount
     }
 
     var statusDisplay: (statusText: String, progressColor: Color, textColor: Color) {
@@ -68,5 +90,15 @@ final class Item {
         let _statusText = "Expires \(expiryDate.formatted(.relative(presentation: .numeric)))."
 
         return (statusText: _statusText, progressColor: _progressColor, textColor: _textColor)
+    }
+
+    var entryCountProgressColor: Color {
+        if remainingEntries <= 1 {
+            return .red
+        } else if remainingEntries <= 3 {
+            return .yellow
+        } else {
+            return .green
+        }
     }
 }
