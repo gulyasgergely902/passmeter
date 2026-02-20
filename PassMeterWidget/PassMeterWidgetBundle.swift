@@ -12,7 +12,5 @@ import SwiftUI
 struct PassMeterWidgetBundle: WidgetBundle {
     var body: some Widget {
         PassMeterWidget()
-        //PassMeterWidgetControl()
-        //PassMeterWidgetLiveActivity()
     }
 }
