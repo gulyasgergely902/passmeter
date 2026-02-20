@@ -38,6 +38,7 @@ struct AddPassView: View {
                     DatePicker(
                         "Expiry Date",
                         selection: $expiryDate,
+						in: Date()...,
                         displayedComponents: .date)
                 }
                 Section("Entry Count") {
@@ -49,12 +50,16 @@ struct AddPassView: View {
                 }
                 Section(
                     header: Text("Expiry Notification"),
-                    footer: Text("The app will notify you before the expiration offset by the number of days specified here at 9am.")
+					footer: Group {
+						if isNotificationEnabled {
+							Text("The app will notify you on \(Utils.calculateDateBeforeDays(date: expiryDate, days: notificationOffsetDays) ?? Date.now, format: .dateTime.month().day().year()) at 9am.")
+						}
+					}
                 ) {
                     Toggle("Enable Notifications", isOn: $isNotificationEnabled)
                     
                     if isNotificationEnabled {
-                        Stepper("Days: \(notificationOffsetDays)", value: $notificationOffsetDays, in: 1...Utils.calculateMaxDays(from: .now, to: expiryDate))
+                        Stepper("Days before: \(notificationOffsetDays)", value: $notificationOffsetDays, in: 1...Utils.calculateMaxDays(from: .now, to: expiryDate))
                     }
                 }
             }

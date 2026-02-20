@@ -14,4 +14,12 @@ class Utils {
         let days = components.day ?? 1
         return max(1, days)
     }
+
+	static func calculateDateBeforeDays(date: Date, days: Int) -> Date? {
+		let calendar = Calendar.current
+
+		let calculatedDate = calendar.date(byAdding: .day, value: -days, to: date)
+
+		return calculatedDate
+	}
 }
