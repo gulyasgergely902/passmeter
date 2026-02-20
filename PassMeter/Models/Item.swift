@@ -20,7 +20,10 @@ final class Item {
     var totalEntries: Int = 0
     var remainingEntries: Int = 0
 
-    init(title: String, startDate: Date, expiryDate: Date, hasEntryLimit: Bool = false, totalEntries: Int = 0) {
+    var isNotificationEnabled: Bool = false
+    var notificationOffsetDays: Int = 3
+
+    init(title: String, startDate: Date, expiryDate: Date, hasEntryLimit: Bool = false, totalEntries: Int = 0, isNotificationsEnabled: Bool = false, notificationOffsetDays: Int = 3) {
         self.id = UUID()
         self.title = title
         self.startDate = startDate
@@ -28,10 +31,15 @@ final class Item {
         self.hasEntryLimit = hasEntryLimit
         self.totalEntries = totalEntries
         self.remainingEntries = totalEntries
+        self.isNotificationEnabled = isNotificationsEnabled
+        self.notificationOffsetDays = notificationOffsetDays
     }
 
     var progressRatio: (dateProgressRatio: Double, entryProgressRatio: Double) {
-        let passDuration = expiryDate.timeIntervalSince(startDate)
+        let calendar = Calendar.current
+        let endOfExpiryDay = calendar.date(bySettingHour: 23, minute: 59, second: 59, of: expiryDate) ?? expiryDate
+
+        let passDuration = endOfExpiryDay.timeIntervalSince(startDate)
         let elapsedSinceStart = Date().timeIntervalSince(startDate)
 
         var dateProgress: Double = 0

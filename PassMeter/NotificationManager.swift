@@ -22,14 +22,14 @@ class NotificationManager {
         }
     }
 
-    func scheduleNotification(for item: Item) {
+    func scheduleNotification(for item: Item, offset: Int) {
         let content = UNMutableNotificationContent()
         content.title = "Pass Expiring"
         content.body = "\(item.title)' is about to expire."
         content.sound = .default
 
         let calendar = Calendar.current
-        var triggerDate = calendar.date(byAdding: .day, value: -3, to: item.expiryDate) ?? item.expiryDate
+        let triggerDate = calendar.date(byAdding: .day, value: -offset, to: item.expiryDate) ?? item.expiryDate
 
         let components = calendar.dateComponents([.year, .month, .day], from: triggerDate)
         var scheduledComponents = components
