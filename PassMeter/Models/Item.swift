@@ -84,22 +84,38 @@ final class Item {
 		return basedOnTime || basedOnEntryCount
 	}
 
-	var statusDisplay: (statusText: String, progressColor: Color, textColor: Color) {
+	var statusDisplay: (progressColor: Color, textColor: Color) {
 		if isExpired {
-			return (statusText: "Expired", progressColor: .gray, textColor: .red)
+			return (progressColor: .gray, textColor: .red)
 		}
 
 		let calendar = Calendar.current
 		if calendar.isDateInToday(expiryDate) {
-			return (statusText: "Expires Today", progressColor: .red, textColor: .red)
+			return (progressColor: .red, textColor: .red)
 		}
 
 		let days = daysRemaining
 		let _textColor: Color = days <= 3 ? .red : (days <= 7 ? .yellow : .gray)
 		let _progressColor: Color = days <= 3 ? .red : (days <= 7 ? .yellow : .blue)
-		let _statusText = "Expires \(expiryDate.formatted(.relative(presentation: .numeric)))."
 
-		return (statusText: _statusText, progressColor: _progressColor, textColor: _textColor)
+		return (progressColor: _progressColor, textColor: _textColor)
+	}
+
+	var statusText: String {
+		if isExpired {
+			return "Expired"
+		}
+
+		let calendar = Calendar.current
+		if calendar.isDateInToday(expiryDate) {
+			return "Expires Today"
+		}
+
+		return "Expires \(expiryDate.formatted(.relative(presentation: .numeric)))"
+	}
+
+	var entryCountText: String {
+		return "\(remainingEntries) entries left"
 	}
 
 	var entryCountProgressColor: Color {

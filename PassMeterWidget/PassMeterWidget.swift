@@ -22,6 +22,7 @@ struct WidgetItem: Identifiable {
 	let hasEntryLimit: Bool
 	let entryProgress: Double
 	let entryProgressColor: Color
+	let entryCountText: String
 }
 
 struct WidgetItemsList: TimelineEntry {
@@ -40,7 +41,8 @@ let mockWidget = WidgetItem(
 	textColor: .gray,
 	hasEntryLimit: false,
 	entryProgress: 0.0,
-	entryProgressColor: .gray
+	entryProgressColor: .gray,
+	entryCountText: "N/A"
 )
 
 struct Provider: TimelineProvider {
@@ -76,11 +78,12 @@ struct Provider: TimelineProvider {
 					progress: item.progressRatio.dateProgressRatio,
 					isExpired: item.isExpired,
 					progressColor: item.statusDisplay.progressColor,
-					statusText: item.statusDisplay.statusText,
+					statusText: item.statusText,
 					textColor: item.statusDisplay.textColor,
 					hasEntryLimit: item.hasEntryLimit,
 					entryProgress: item.progressRatio.entryProgressRatio,
-					entryProgressColor: item.entryCountProgressColor
+					entryProgressColor: item.entryCountProgressColor,
+					entryCountText: item.entryCountText
 				)
 			}
 		} catch {
@@ -96,11 +99,12 @@ struct Provider: TimelineProvider {
 			progress: 0.7,
 			isExpired: false,
 			progressColor: .blue,
-			statusText: "Sample Status",
+			statusText: "Expires in 24 days",
 			textColor: .blue,
 			hasEntryLimit: true,
 			entryProgress: 40.0,
-			entryProgressColor: .green
+			entryProgressColor: .green,
+			entryCountText: "3 entries left"
 		)
 		return WidgetItemsList(
 			date: .now,
@@ -206,12 +210,24 @@ struct MediumWidgetView: View {
 							.fontWeight(.bold)
 							.lineLimit(2)
 
-						Text(item.expiryDate, style: .date)
-							.font(.system(.caption, design: .rounded))
-							.foregroundStyle(.secondary)
+						HStack(spacing: 2) {
+							Text(item.statusText)
+								.foregroundColor(item.textColor)
+								.font(.system(.subheadline, design: .rounded))
+								.foregroundStyle(.secondary)
+							if item.hasEntryLimit {
+								Text("•")
+									.foregroundColor(item.textColor)
+									.font(.system(.subheadline, design: .rounded))
+									.foregroundStyle(.secondary)
+								Text(item.entryCountText)
+									.foregroundColor(item.textColor)
+									.font(.system(.subheadline, design: .rounded))
+									.foregroundStyle(.secondary)
+							}
+						}
 
-						Text(item.statusText)
-							.foregroundColor(item.textColor)
+						Text(item.expiryDate, style: .date)
 							.font(.system(.caption, design: .rounded))
 							.foregroundStyle(.secondary)
 					}

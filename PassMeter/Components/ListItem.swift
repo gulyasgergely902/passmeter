@@ -43,30 +43,36 @@ struct ListItem: View {
             .frame(width: 45, height: 45)
 
             VStack(alignment: .leading) {
-                HStack(spacing: 2) {
-                    Text(item.title)
-                        .font(.headline)
-                    if item.isNotificationEnabled {
-                        Image(systemName: "bell.fill")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                }
+				Text(item.title)
+					.font(.system(.headline, design: .rounded))
 
-                Text(item.expiryDate.formatted(date: .abbreviated, time: .omitted))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-
-                Text(item.statusDisplay.statusText)
-                    .foregroundColor(item.statusDisplay.textColor)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                if item.hasEntryLimit {
-                    Text("Remaining entries: \(item.remainingEntries)")
-                        .foregroundColor(item.statusDisplay.textColor)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+				HStack(spacing: 2) {
+					Text(item.statusText)
+						.foregroundColor(item.statusDisplay.textColor)
+						.font(.system(.subheadline, design: .rounded))
+						.foregroundStyle(.secondary)
+					if item.hasEntryLimit {
+						Text("•")
+							.foregroundColor(item.statusDisplay.textColor)
+							.font(.system(.subheadline, design: .rounded))
+							.foregroundStyle(.secondary)
+						Text(item.entryCountText)
+							.foregroundColor(item.statusDisplay.textColor)
+							.font(.system(.subheadline, design: .rounded))
+							.foregroundStyle(.secondary)
+					}
+				}
+				
+				HStack(spacing: 2) {
+					Text(item.expiryDate.formatted(date: .abbreviated, time: .omitted))
+						.font(.system(.caption, design: .rounded))
+						.foregroundStyle(.secondary)
+					if item.isNotificationEnabled {
+						Image(systemName: "bell.fill")
+							.font(.system(.caption, design: .rounded))
+							.foregroundStyle(.secondary)
+					}
+				}
             }
         }
         .padding(.vertical, 4)
