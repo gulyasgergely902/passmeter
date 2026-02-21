@@ -9,11 +9,11 @@ import SwiftUI
 import SwiftData
 
 class Utils {
-    static func calculateMaxDays(from start: Date, to end: Date) -> Int {
-        let components = Calendar.current.dateComponents([.day], from: start, to: end)
-        let days = components.day ?? 1
-        return max(1, days)
-    }
+	static func calculateMaxDays(from start: Date, to end: Date) -> Int {
+		let components = Calendar.current.dateComponents([.day], from: start, to: end)
+		let days = components.day ?? 1
+		return max(1, days)
+	}
 
 	static func calculateDateBeforeDays(date: Date, days: Int) -> Date? {
 		let calendar = Calendar.current
