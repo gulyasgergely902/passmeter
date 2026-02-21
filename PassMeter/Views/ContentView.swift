@@ -16,6 +16,7 @@ struct ContentView: View {
     @State private var isShowingAddModal = false
     @State private var selectedItem: Item?
     @State private var itemToCheckIn: Item?
+	@State private var itemForDetails: Item?
     @State private var isShowingConfirm = false
 
     @State private var confeTrigger = 0
@@ -54,13 +55,13 @@ struct ContentView: View {
                                 .tint(.blue)
                             }
                         }
+						.onTapGesture {
+							itemForDetails = item
+						}
                     }
                 }
                 .navigationTitle("My Passes")
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        EditButton()
-                    }
                     ToolbarItemGroup(placement: .topBarTrailing) {
                         NavigationLink {
                             SettingsView()
@@ -87,10 +88,13 @@ struct ContentView: View {
                     }.presentationDetents([.large])
                 }
                 .sheet(item: $selectedItem) { selectedItem in
-                    RenewPassView (item: selectedItem) { expiryDate, entryCount, isNotificationEnabled, notificationOffsetDays in
-                        renewItem(itemToRenew: selectedItem, expiryDate: expiryDate, entryCount: entryCount, isNotificationEnabled: isNotificationEnabled, notificationOffsetDays: notificationOffsetDays)
+                    RenewPassView (item: selectedItem) { startDate, expiryDate, entryCount, isNotificationEnabled, notificationOffsetDays in
+						renewItem(itemToRenew: selectedItem, startDate: startDate, expiryDate: expiryDate, entryCount: entryCount, isNotificationEnabled: isNotificationEnabled, notificationOffsetDays: notificationOffsetDays)
                     }.presentationDetents([.large])
                 }
+				.sheet(item: $itemForDetails) { item in
+					PassDetailsView(item: item)
+				}
                 .onAppear {
                     NotificationManager.instance.requestAuthorization()
                 }
@@ -129,11 +133,11 @@ struct ContentView: View {
         }
     }
 
-    private func renewItem(itemToRenew: Item, expiryDate: Date, entryCount: Int, isNotificationEnabled: Bool = false, notificationOffsetDays: Int = 3) {
+	private func renewItem(itemToRenew: Item, startDate: Date, expiryDate: Date, entryCount: Int, isNotificationEnabled: Bool = false, notificationOffsetDays: Int = 3) {
         print("Renew Item")
         withAnimation{
             NotificationManager.instance.cancelNotification(for: itemToRenew)
-            itemToRenew.startDate = .now
+            itemToRenew.startDate = startDate
             itemToRenew.expiryDate = expiryDate
             itemToRenew.totalEntries = entryCount
             itemToRenew.remainingEntries = entryCount
@@ -174,6 +178,7 @@ struct ContentView: View {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
             if item.remainingEntries > 0 {
                 item.remainingEntries -= 1
+				item.entries.append(.now)
             }
         }
 

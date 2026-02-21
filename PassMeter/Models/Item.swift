@@ -11,29 +11,31 @@ import SwiftUI
 
 @Model
 final class Item {
-    @Attribute(.unique) var id: UUID = UUID()
-    var title: String
-    var startDate: Date
-    var expiryDate: Date
+	@Attribute(.unique) var id: UUID = UUID()
+	var title: String
+	var startDate: Date
+	var expiryDate: Date
 
-    var hasEntryLimit: Bool = false
-    var totalEntries: Int = 0
-    var remainingEntries: Int = 0
+	var hasEntryLimit: Bool = false
+	var totalEntries: Int = 0
+	var remainingEntries: Int = 0
 
-    var isNotificationEnabled: Bool = false
-    var notificationOffsetDays: Int = 3
+	var isNotificationEnabled: Bool = false
+	var notificationOffsetDays: Int = 3
 
-    init(title: String, startDate: Date, expiryDate: Date, hasEntryLimit: Bool = false, totalEntries: Int = 0, isNotificationsEnabled: Bool = false, notificationOffsetDays: Int = 3) {
-        self.id = UUID()
-        self.title = title
-        self.startDate = startDate
-        self.expiryDate = expiryDate
-        self.hasEntryLimit = hasEntryLimit
-        self.totalEntries = totalEntries
-        self.remainingEntries = totalEntries
-        self.isNotificationEnabled = isNotificationsEnabled
-        self.notificationOffsetDays = notificationOffsetDays
-    }
+	var entries: [Date] = []
+
+	init(title: String, startDate: Date, expiryDate: Date, hasEntryLimit: Bool = false, totalEntries: Int = 0, isNotificationsEnabled: Bool = false, notificationOffsetDays: Int = 3) {
+		self.id = UUID()
+		self.title = title
+		self.startDate = startDate
+		self.expiryDate = expiryDate
+		self.hasEntryLimit = hasEntryLimit
+		self.totalEntries = totalEntries
+		self.remainingEntries = totalEntries
+		self.isNotificationEnabled = isNotificationsEnabled
+		self.notificationOffsetDays = notificationOffsetDays
+	}
 
     var progressRatio: (dateProgressRatio: Double, entryProgressRatio: Double) {
         let calendar = Calendar.current
@@ -89,7 +91,7 @@ final class Item {
 
         let calendar = Calendar.current
         if calendar.isDateInToday(expiryDate) {
-            return (statusText: "Today", progressColor: .red, textColor: .red)
+            return (statusText: "Expires Today", progressColor: .red, textColor: .red)
         }
 
         let days = daysRemaining

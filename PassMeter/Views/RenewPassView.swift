@@ -13,17 +13,19 @@ struct RenewPassView: View {
 
     let item: Item
 
+	@State private var startDate: Date
     @State private var expiryDate: Date
     @State private var entryCount: Int
     @State private var isNotificationEnabled: Bool = false
     @State private var notificationOffsetDays: Int = 3
 
-    var onSave: (Date, Int, Bool, Int) -> Void
+    var onSave: (Date, Date, Int, Bool, Int) -> Void
 
-    init(item: Item, onSave: @escaping (Date, Int, Bool, Int) -> Void) {
+    init(item: Item, onSave: @escaping (Date, Date, Int, Bool, Int) -> Void) {
         self.item = item
         self.onSave = onSave
 
+		_startDate = State(initialValue: item.startDate)
         _expiryDate = State(initialValue: item.expiryDate)
         _entryCount = State(initialValue: item.totalEntries)
         _isNotificationEnabled = State(initialValue: item.isNotificationEnabled)
@@ -42,7 +44,11 @@ struct RenewPassView: View {
                 Section(
                     header: Text("Timeline")
                 ) {
-                    LabeledContent("Start Date", value: Date.now.formatted(date: .long, time: .omitted))
+					DatePicker(
+						"Start Date",
+						selection: $startDate,
+						displayedComponents: .date
+					)
                     DatePicker(
                         "Expiry Date",
                         selection: $expiryDate,
@@ -59,7 +65,11 @@ struct RenewPassView: View {
                 }
                 Section(
                     header: Text("Expiry Notification"),
-                    footer: Text("The app will notify you before the expiration offset by the number of days specified here at 9am.")
+					footer: Group {
+						if isNotificationEnabled {
+							Text("The app will notify you on \(Utils.calculateDateBeforeDays(date: expiryDate, days: notificationOffsetDays) ?? Date.now, format: .dateTime.month().day().year()) at 9am.")
+						}
+					}
                 ) {
                     Toggle("Enable Notifications", isOn: $isNotificationEnabled)
 
@@ -85,7 +95,7 @@ struct RenewPassView: View {
                     Button {
                         let generator = UINotificationFeedbackGenerator()
                         generator.notificationOccurred(.success)
-                        onSave(expiryDate, entryCount, isNotificationEnabled, notificationOffsetDays)
+                        onSave(startDate, expiryDate, entryCount, isNotificationEnabled, notificationOffsetDays)
                         dismiss()
                     } label: {
                         Image(systemName: "checkmark")

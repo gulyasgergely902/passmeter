@@ -10,7 +10,9 @@ import SwiftUI
 struct SettingsView: View {
     var body: some View {
         Form {
-            Section(header: Text("Notifications")) {
+            Section(
+				header: Text("Notifications")
+			) {
                 Button {
                     let generator = UIImpactFeedbackGenerator(style: .medium)
                         generator.impactOccurred()
@@ -25,7 +27,6 @@ struct SettingsView: View {
                     }
                 }
 
-                // Tip: In a real app, you'd add a link to System Settings here
                 Button("System Notification Settings") {
                     if let url = URL(string: UIApplication.openSettingsURLString) {
                         UIApplication.shared.open(url)
@@ -34,7 +35,15 @@ struct SettingsView: View {
                 .font(.footnote)
             }
 
-            Section(header: Text("About")) {
+			Section(
+				header: Text("Icon")
+			) {
+
+			}
+
+            Section(
+				header: Text("About")
+			) {
                 HStack {
                     Text("Version")
                     Spacer()

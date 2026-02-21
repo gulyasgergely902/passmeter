@@ -75,6 +75,13 @@
 			);
 			target = E46B65952F449138005F5C8A /* PassMeterWidgetExtension */;
 		};
+		E485C9D32F48E7D8006CC679 /* Exceptions for "PassMeter" folder in "PassMeter" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E47CF3372F43ABDB0097A4AC /* PassMeter */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -89,6 +96,7 @@
 		E47CF33A2F43ABDB0097A4AC /* PassMeter */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				E485C9D32F48E7D8006CC679 /* Exceptions for "PassMeter" folder in "PassMeter" target */,
 				E46B65B12F44924F005F5C8A /* Exceptions for "PassMeter" folder in "PassMeterWidgetExtension" target */,
 			);
 			path = PassMeter;
@@ -601,6 +609,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PassMeter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PassMeter;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -650,6 +659,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = PassMeter/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = PassMeter;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
