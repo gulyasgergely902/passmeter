@@ -10,7 +10,7 @@ import SwiftUI
 
 @main
 struct PassMeterWidgetBundle: WidgetBundle {
-    var body: some Widget {
-        PassMeterWidget()
-    }
+	var body: some Widget {
+		PassMeterWidget()
+	}
 }
