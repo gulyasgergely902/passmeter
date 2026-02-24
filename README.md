@@ -8,3 +8,6 @@ PassMeter is a simple yet powerful iOS app that helps you track pass expirations
 - Get reminders before a pass expires.
 - Add Home Screen widgets that display your next expiring pass or the next two upcoming expirations.
 - Track passes by expiration date, with optional usage-based tracking enabled when needed.
+
+> [!NOTE]
+> This application was partially created using AI.
