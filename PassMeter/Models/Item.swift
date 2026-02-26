@@ -25,6 +25,10 @@ final class Item {
 
 	var entries: [Date] = []
 
+	var sortedEntries: [Date] {
+		entries.sorted(by: >)
+	}
+
 	init(title: String, startDate: Date, expiryDate: Date, hasEntryLimit: Bool = false, totalEntries: Int = 0, isNotificationsEnabled: Bool = false, reminderNotificationDate: Date) {
 		self.id = UUID()
 		self.title = title
