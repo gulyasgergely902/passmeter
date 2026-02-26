@@ -24,7 +24,7 @@ struct PassDetailsView: View {
 				}
 				if item.hasEntryLimit {
 					Section("History") {
-						ForEach(item.entries, id: \.self) { entry in
+						ForEach(item.sortedEntries, id: \.self) { entry in
 							HStack {
 								Image(systemName: "calendar.badge.checkmark")
 								Text(entry.formatted(date: .abbreviated, time: .shortened))
