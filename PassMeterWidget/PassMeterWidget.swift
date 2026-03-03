@@ -23,6 +23,7 @@ struct WidgetItem: Identifiable {
 	let entryProgress: Double
 	let entryProgressColor: Color
 	let entryCountText: String
+	let isNotificationEnabled: Bool
 }
 
 struct WidgetItemsList: TimelineEntry {
@@ -42,7 +43,8 @@ let mockWidget = WidgetItem(
 	hasEntryLimit: false,
 	entryProgress: 0.0,
 	entryProgressColor: .gray,
-	entryCountText: "N/A"
+	entryCountText: "N/A",
+	isNotificationEnabled: true
 )
 
 struct Provider: TimelineProvider {
@@ -83,7 +85,8 @@ struct Provider: TimelineProvider {
 					hasEntryLimit: item.hasEntryLimit,
 					entryProgress: item.progressRatio.entryProgressRatio,
 					entryProgressColor: item.entryCountProgressColor,
-					entryCountText: item.entryCountText
+					entryCountText: item.entryCountText,
+					isNotificationEnabled: item.isNotificationEnabled
 				)
 			}
 		} catch {
@@ -104,7 +107,8 @@ struct Provider: TimelineProvider {
 			hasEntryLimit: true,
 			entryProgress: 40.0,
 			entryProgressColor: .green,
-			entryCountText: "3 entries left"
+			entryCountText: "3 entries left",
+			isNotificationEnabled: true
 		)
 		return WidgetItemsList(
 			date: .now,
@@ -146,12 +150,24 @@ struct SmallWidgetView: View {
 					.fontWeight(.bold)
 					.lineLimit(2)
 
-				Text(item.expiryDate, style: .date)
-					.font(.system(.caption, design: .rounded))
-					.foregroundStyle(.secondary)
+				HStack(spacing: 2) {
+					Text(item.statusText)
+						.foregroundColor(item.textColor)
+						.font(.system(.subheadline, design: .rounded))
+						.foregroundStyle(.secondary)
+					if item.hasEntryLimit {
+						Text("•")
+							.foregroundColor(item.textColor)
+							.font(.system(.subheadline, design: .rounded))
+							.foregroundStyle(.secondary)
+						Text(item.entryCountText)
+							.foregroundColor(item.textColor)
+							.font(.system(.subheadline, design: .rounded))
+							.foregroundStyle(.secondary)
+					}
+				}
 
-				Text(item.statusText)
-					.foregroundColor(item.textColor)
+				Text(item.expiryDate, style: .date)
 					.font(.system(.caption, design: .rounded))
 					.foregroundStyle(.secondary)
 			}
@@ -254,10 +270,17 @@ struct MediumWidgetView: View {
 									.foregroundStyle(.secondary)
 							}
 						}
-
-						Text(item.expiryDate, style: .date)
-							.font(.system(.caption, design: .rounded))
-							.foregroundStyle(.secondary)
+						
+						HStack(spacing: 2) {
+							Text(item.expiryDate.formatted(date: .abbreviated, time: .omitted))
+								.font(.system(.caption, design: .rounded))
+								.foregroundStyle(.secondary)
+							if item.isNotificationEnabled {
+								Image(systemName: "bell.fill")
+									.font(.system(.caption, design: .rounded))
+									.foregroundStyle(.secondary)
+							}
+						}
 					}
 
 					Spacer()

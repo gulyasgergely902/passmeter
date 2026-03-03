@@ -99,8 +99,8 @@ final class Item {
 		}
 
 		let days = daysRemaining
-		let _textColor: Color = days <= 3 ? .red : (days <= 7 ? .yellow : .gray)
-		let _progressColor: Color = days <= 3 ? .red : (days <= 7 ? .yellow : .blue)
+		let _textColor: Color = days <= 3 ? .red : (days <= 7 ? .orange : .gray)
+		let _progressColor: Color = days <= 3 ? .red : (days <= 7 ? .orange : .blue)
 
 		return (progressColor: _progressColor, textColor: _textColor)
 	}
@@ -126,7 +126,7 @@ final class Item {
 		if remainingEntries <= 1 {
 			return .red
 		} else if remainingEntries <= 3 {
-			return .yellow
+			return .orange
 		} else {
 			return .green
 		}
