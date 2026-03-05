@@ -81,15 +81,15 @@ final class Item {
 		let today = calendar.startOfDay(for: .now)
 		let expiry = calendar.startOfDay(for: expiryDate)
 
-		let basedOnTime = expiry < today
+		return expiry < today
+	}
 
-		let basedOnEntryCount = (hasEntryLimit && remainingEntries <= 0)
-
-		return basedOnTime || basedOnEntryCount
+	var isRunOutOfEntries: Bool {
+		return (hasEntryLimit && remainingEntries <= 0)
 	}
 
 	var statusDisplay: (progressColor: Color, textColor: Color) {
-		if isExpired {
+		if isExpired || isRunOutOfEntries {
 			return (progressColor: .gray, textColor: .red)
 		}
 
