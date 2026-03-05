@@ -13,19 +13,17 @@ struct RenewPassView: View {
 
 	let item: Item
 
-	@State private var startDate: Date
 	@State private var expiryDate: Date
 	@State private var entryCount: Int
 	@State private var isNotificationEnabled: Bool = false
 	@State private var reminderNotificationDate: Date
 
-	var onSave: (Date, Date, Int, Bool, Date) -> Void
+	var onSave: (Date, Int, Bool, Date) -> Void
 
-	init(item: Item, onSave: @escaping (Date, Date, Int, Bool, Date) -> Void) {
+	init(item: Item, onSave: @escaping (Date, Int, Bool, Date) -> Void) {
 		self.item = item
 		self.onSave = onSave
 
-		_startDate = State(initialValue: item.startDate)
 		_expiryDate = State(initialValue: item.expiryDate)
 		_entryCount = State(initialValue: item.totalEntries)
 		_isNotificationEnabled = State(initialValue: item.isNotificationEnabled)
@@ -36,18 +34,10 @@ struct RenewPassView: View {
 		NavigationStack {
 			Form {
 				Section(
-					header: Text("Pass Details"),
-					footer: Text("Pass names cannot be edited after creation")
-				) {
-					LabeledContent("Pass Name", value: item.title)
-				}
-				Section(
 					header: Text("Timeline")
 				) {
-					DatePicker(
-						"Start Date",
-						selection: $startDate,
-						displayedComponents: .date
+					LabeledContent(
+						"Start Date", value: Date.now.formatted(date: .long, time: .omitted)
 					)
 					DatePicker(
 						"Expiry Date",
@@ -82,7 +72,7 @@ struct RenewPassView: View {
 					}
 				}
 			}
-			.navigationTitle("Renew Pass")
+			.navigationTitle(item.title)
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
@@ -99,7 +89,7 @@ struct RenewPassView: View {
 					Button {
 						let generator = UINotificationFeedbackGenerator()
 						generator.notificationOccurred(.success)
-						onSave(startDate, expiryDate, entryCount, isNotificationEnabled, reminderNotificationDate)
+						onSave(expiryDate, entryCount, isNotificationEnabled, reminderNotificationDate)
 						dismiss()
 					} label: {
 						Image(systemName: "checkmark")
