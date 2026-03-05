@@ -10,6 +10,9 @@ import SwiftData
 
 struct AddPassView: View {
 	@Environment(\.dismiss) private var dismiss
+
+	let item: Item?
+
 	@State private var title: String = ""
 	@State private var startDate: Date = Date()
 	@State private var expiryDate: Date = Date().addingTimeInterval(86400 * 30)
@@ -19,6 +22,11 @@ struct AddPassView: View {
 	@State private var reminderNotificationDate: Date = Date()
 
 	var onSave: (String, Date, Date, Bool, Int, Bool, Date) -> Void
+
+	init(item: Item? = nil, onSave: @escaping (String, Date, Date, Bool, Int, Bool, Date) -> Void) {
+		self.item = item
+		self.onSave = onSave
+	}
 
 	var body: some View {
 		NavigationStack {
@@ -67,7 +75,18 @@ struct AddPassView: View {
 					}
 				}
 			}
-			.navigationTitle("Add Pass")
+			.onAppear {
+				if let item = item {
+					title = item.title
+					startDate = item.startDate
+					expiryDate = item.expiryDate
+					hasEntryLimit = item.hasEntryLimit
+					totalEntries = item.totalEntries
+					isNotificationEnabled = item.isNotificationEnabled
+					reminderNotificationDate = item.reminderNotificationDate
+				}
+			}
+			.navigationTitle(item == nil ? "New Pass" : "Edit Pass")
 			.navigationBarTitleDisplayMode(.inline)
 			.toolbar {
 				ToolbarItem(placement: .cancellationAction) {
