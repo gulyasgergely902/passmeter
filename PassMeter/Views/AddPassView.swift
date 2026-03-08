@@ -33,27 +33,51 @@ struct AddPassView: View {
 			Form {
 				Section(
 					header: Text("Pass Details"),
-					footer: Text("Pass names cannot be edited after creation")
+					footer: Text("Pass names cannot be edited after creation.")
 				) {
 					TextField("Pass Name", text: $title)
 				}
-				Section("Timeline") {
-					DatePicker(
-						"Start Date",
-						selection: $startDate,
-						displayedComponents: .date)
+				Section(
+					header: Text("Timeline")
+				) {
+					HStack(spacing: 2) {
+						DatePicker(
+							"",
+							selection: $startDate,
+							displayedComponents: .date
+						)
+						.labelsHidden()
 
-					DatePicker(
-						"Expiry Date",
-						selection: $expiryDate,
-						in: Date()...,
-						displayedComponents: .date)
+						Spacer()
+
+						Image(systemName: "arrow.right")
+							.fontWeight(.bold)
+							.foregroundColor(.gray)
+
+						Spacer()
+
+						DatePicker(
+							"",
+							selection: $expiryDate,
+							in: Date()...,
+							displayedComponents: .date
+						)
+						.labelsHidden()
+					}
 				}
-				Section("Entry Count") {
-					Toggle("Limited Entries", isOn: $hasEntryLimit)
+				Section(
+					header: Text("Entry Count"),
+					footer: Text("Limited-entry tracking, managed separately from expiration.")
+				) {
+					Toggle("Limited Entries", isOn: $hasEntryLimit.animation(.spring()))
 
 					if hasEntryLimit {
-						Stepper("Total Entries: \(totalEntries)", value: $totalEntries, in: 1...100)
+						Stepper(
+							"Total Entries: \(totalEntries)",
+							value: $totalEntries,
+							in: 1...100
+						)
+						.transition(.move(edge: .top).combined(with: .opacity))
 					}
 				}
 				Section(
@@ -64,7 +88,7 @@ struct AddPassView: View {
 						}
 					}
 				) {
-					Toggle("Enable", isOn: $isNotificationEnabled)
+					Toggle("Enable", isOn: $isNotificationEnabled.animation(.spring()))
 					
 					if isNotificationEnabled {
 						DatePicker(
@@ -72,6 +96,7 @@ struct AddPassView: View {
 							selection: $reminderNotificationDate,
 							displayedComponents: [.date, .hourAndMinute]
 						)
+						.transition(.move(edge: .top).combined(with: .opacity))
 					}
 				}
 			}
