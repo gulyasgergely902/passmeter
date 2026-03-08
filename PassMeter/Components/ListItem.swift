@@ -68,6 +68,9 @@ struct ListItem: View {
 						.font(.system(.caption, design: .rounded))
 						.foregroundStyle(.secondary)
 					if item.isNotificationEnabled {
+						Text("•")
+							.font(.system(.caption, design: .rounded))
+							.foregroundStyle(.secondary)
 						Image(systemName: "bell.fill")
 							.font(.system(.caption, design: .rounded))
 							.foregroundStyle(.secondary)

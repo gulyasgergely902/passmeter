@@ -36,15 +36,27 @@ struct RenewPassView: View {
 				Section(
 					header: Text("Timeline")
 				) {
-					LabeledContent(
-						"Start Date", value: Date.now.formatted(date: .long, time: .omitted)
-					)
-					DatePicker(
-						"Expiry Date",
-						selection: $expiryDate,
-						in: Date()...,
-						displayedComponents: .date
-					)
+					HStack(spacing: 2) {
+						Text(
+							Date.now.formatted(date: .long, time: .omitted)
+						)
+
+						Spacer()
+
+						Image(systemName: "arrow.right")
+							.fontWeight(.bold)
+							.foregroundColor(.gray)
+
+						Spacer()
+
+						DatePicker(
+							"Expiry Date",
+							selection: $expiryDate,
+							in: Date()...,
+							displayedComponents: .date
+						)
+						.labelsHidden()
+					}
 				}
 				if item.hasEntryLimit {
 					Section(

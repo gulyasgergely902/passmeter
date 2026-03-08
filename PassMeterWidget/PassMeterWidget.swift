@@ -166,10 +166,19 @@ struct SmallWidgetView: View {
 							.foregroundStyle(.secondary)
 					}
 				}
-
-				Text(item.expiryDate, style: .date)
-					.font(.system(.caption, design: .rounded))
-					.foregroundStyle(.secondary)
+				HStack(spacing: 2) {
+					Text(item.expiryDate.formatted(date: .abbreviated, time: .omitted))
+						.font(.system(.caption, design: .rounded))
+						.foregroundStyle(.secondary)
+					if item.isNotificationEnabled {
+						Text("•")
+							.font(.system(.caption, design: .rounded))
+							.foregroundStyle(.secondary)
+						Image(systemName: "bell.fill")
+							.font(.system(.caption, design: .rounded))
+							.foregroundStyle(.secondary)
+					}
+				}
 			}
 				Spacer()
 				Text("")
@@ -276,6 +285,9 @@ struct MediumWidgetView: View {
 								.font(.system(.caption, design: .rounded))
 								.foregroundStyle(.secondary)
 							if item.isNotificationEnabled {
+								Text("•")
+									.font(.system(.caption, design: .rounded))
+									.foregroundStyle(.secondary)
 								Image(systemName: "bell.fill")
 									.font(.system(.caption, design: .rounded))
 									.foregroundStyle(.secondary)

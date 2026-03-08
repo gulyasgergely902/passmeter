@@ -110,12 +110,7 @@ final class Item {
 			return "Expired"
 		}
 
-		let calendar = Calendar.current
-		if calendar.isDateInToday(expiryDate) {
-			return "Expires Today"
-		}
-
-		return "Expires \(expiryDate.formatted(.relative(presentation: .numeric)))"
+		return "Expires \(expiryDate.formatted(.relative(presentation: .named)))"
 	}
 
 	var entryCountText: String {

@@ -90,7 +90,7 @@ struct ContentView: View {
 				.sheet(item: $selectedItem) { selectedItem in
 					RenewPassView (item: selectedItem) { expiryDate, entryCount, isNotificationEnabled, reminderNotificationDate in
 						renewItem(itemToRenew: selectedItem, expiryDate: expiryDate, entryCount: entryCount, isNotificationEnabled: isNotificationEnabled, reminderNotificationDate: reminderNotificationDate)
-					}.presentationDetents([.large])
+					}.presentationDetents([.medium])
 				}
 				.sheet(item: $itemForDetails) { item in
 					PassDetailsView(item: item)
