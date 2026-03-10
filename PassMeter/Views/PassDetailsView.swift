@@ -20,9 +20,32 @@ struct PassDetailsView: View {
 	var body: some View {
 		NavigationStack {
 			List {
+				Section(
+					header: Text("Timeline")
+				) {
+					HStack(spacing: 2) {
+						Text(
+							Date.now.formatted(date: .long, time: .omitted)
+						)
+
+						Spacer()
+
+						Image(systemName: "arrow.right")
+							.fontWeight(.bold)
+							.foregroundColor(.gray)
+
+						Spacer()
+
+						Text(
+							item.expiryDate.formatted(date: .long, time: .omitted)
+						)
+						.fontWeight(.bold)
+					}
+				}
 				Section("Status") {
-					LabeledContent("Expiration", value: item.expiryDate.formatted(date: .long, time: .omitted))
-					LabeledContent("Notification", value: item.reminderNotificationDate.formatted(date: .long, time: .shortened))
+					if item.isNotificationEnabled {
+						LabeledContent("Notification", value: item.reminderNotificationDate.formatted(date: .long, time: .shortened))
+					}
 					if item.hasEntryLimit {
 						LabeledContent("Entries", value: "\(item.remainingEntries) / \(item.totalEntries)")
 						LabeledContent("Last Entry", value: item.entries.last?.formatted(date: .long, time: .omitted) ?? "No entries yet")
@@ -58,8 +81,8 @@ struct PassDetailsView: View {
 				}
 			}
 			.sheet(item: $editedItem) { editedItem in
-				AddPassView (item: editedItem) { title, startDate, expiryDate, hasEntryLimit, entryCount, isNotificationEnabled, reminderNotificationDate in
-					editItem(itemToEdit: editedItem, title: title, startDate: startDate, expiryDate: expiryDate, hasEntryLimit: hasEntryLimit, entryCount: entryCount, isNotificationEnabled: isNotificationEnabled, reminderNotificationDate: reminderNotificationDate)
+				AddPassView (item: editedItem) { title, startDate, expiryDate, hasEntryLimit, remainingEntries, totalEntries, isNotificationEnabled, reminderNotificationDate in
+					editItem(itemToEdit: editedItem, title: title, startDate: startDate, expiryDate: expiryDate, hasEntryLimit: hasEntryLimit, remainingEntries: remainingEntries, totalEntries: totalEntries, isNotificationEnabled: isNotificationEnabled, reminderNotificationDate: reminderNotificationDate)
 				}.presentationDetents([.large])
 			}
 		}
@@ -67,15 +90,15 @@ struct PassDetailsView: View {
 		.presentationDragIndicator(.visible)
 	}
 
-	private func editItem(itemToEdit: Item, title: String, startDate: Date, expiryDate: Date, hasEntryLimit: Bool, entryCount: Int, isNotificationEnabled: Bool = false, reminderNotificationDate: Date) {
+	private func editItem(itemToEdit: Item, title: String, startDate: Date, expiryDate: Date, hasEntryLimit: Bool, remainingEntries: Int, totalEntries: Int, isNotificationEnabled: Bool = false, reminderNotificationDate: Date) {
 		withAnimation{
 			NotificationManager.instance.cancelNotification(for: itemToEdit)
 			itemToEdit.title = title
 			itemToEdit.startDate = startDate
 			itemToEdit.expiryDate = expiryDate
 			itemToEdit.hasEntryLimit = hasEntryLimit
-			itemToEdit.totalEntries = entryCount
-			itemToEdit.remainingEntries = entryCount
+			itemToEdit.totalEntries = totalEntries
+			itemToEdit.remainingEntries = remainingEntries
 			itemToEdit.isNotificationEnabled = isNotificationEnabled
 			itemToEdit.reminderNotificationDate = reminderNotificationDate
 			if isNotificationEnabled {

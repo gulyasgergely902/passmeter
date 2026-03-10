@@ -17,13 +17,14 @@ struct AddPassView: View {
 	@State private var startDate: Date = Date()
 	@State private var expiryDate: Date = Date().addingTimeInterval(86400 * 30)
 	@State private var hasEntryLimit: Bool = false
+	@State private var remainingEntries: Int = 10
 	@State private var totalEntries: Int = 10
 	@State private var isNotificationEnabled: Bool = false
 	@State private var reminderNotificationDate: Date = Date()
 
-	var onSave: (String, Date, Date, Bool, Int, Bool, Date) -> Void
+	var onSave: (String, Date, Date, Bool, Int, Int, Bool, Date) -> Void
 
-	init(item: Item? = nil, onSave: @escaping (String, Date, Date, Bool, Int, Bool, Date) -> Void) {
+	init(item: Item? = nil, onSave: @escaping (String, Date, Date, Bool, Int, Int, Bool, Date) -> Void) {
 		self.item = item
 		self.onSave = onSave
 	}
@@ -78,6 +79,14 @@ struct AddPassView: View {
 							in: 1...100
 						)
 						.transition(.move(edge: .top).combined(with: .opacity))
+						if item != nil {
+							Stepper(
+								"Remaining Entries: \(remainingEntries)",
+								value: $remainingEntries,
+								in: 0...totalEntries
+							)
+							.transition(.move(edge: .top).combined(with: .opacity))
+						}
 					}
 				}
 				Section(
@@ -94,10 +103,21 @@ struct AddPassView: View {
 						DatePicker(
 							"Select Date and Time",
 							selection: $reminderNotificationDate,
+							in: startDate...,
 							displayedComponents: [.date, .hourAndMinute]
 						)
 						.transition(.move(edge: .top).combined(with: .opacity))
 					}
+				}
+			}
+			.onChange(of: startDate) { _, newStart in
+				if reminderNotificationDate < newStart {
+					reminderNotificationDate = newStart
+				}
+			}
+			.onChange(of: totalEntries) { _, newTotalEntries in
+				if remainingEntries > newTotalEntries {
+					remainingEntries = newTotalEntries
 				}
 			}
 			.onAppear {
@@ -106,9 +126,12 @@ struct AddPassView: View {
 					startDate = item.startDate
 					expiryDate = item.expiryDate
 					hasEntryLimit = item.hasEntryLimit
+					remainingEntries = item.remainingEntries
 					totalEntries = item.totalEntries
 					isNotificationEnabled = item.isNotificationEnabled
 					reminderNotificationDate = item.reminderNotificationDate
+				} else {
+					remainingEntries = totalEntries
 				}
 			}
 			.navigationTitle(item == nil ? "New Pass" : "Edit Pass")
@@ -128,7 +151,7 @@ struct AddPassView: View {
 					Button{
 						let generator = UINotificationFeedbackGenerator()
 						generator.notificationOccurred(.success)
-						onSave(title, startDate, expiryDate, hasEntryLimit, totalEntries, isNotificationEnabled, reminderNotificationDate)
+						onSave(title, startDate, expiryDate, hasEntryLimit, remainingEntries, totalEntries, isNotificationEnabled, reminderNotificationDate)
 						dismiss()
 					} label: {
 						Image(systemName: "checkmark")

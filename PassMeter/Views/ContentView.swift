@@ -75,7 +75,7 @@ struct ContentView: View {
 					}
 				}
 				.sheet(isPresented: $isShowingAddModal) {
-					AddPassView { title, start, expiry, hasEntryLimit, totalEntries, isNotificationEnabled, reminderNotificationDate in
+					AddPassView { title, start, expiry, hasEntryLimit, remainingEntries, totalEntries, isNotificationEnabled, reminderNotificationDate in
 						addItem(
 							title: title,
 							startDate: start,
@@ -108,7 +108,6 @@ struct ContentView: View {
 	}
 
 	private func addItem(title: String, startDate: Date, expiryDate: Date, hasEntryLimit: Bool = false, totalEntries: Int = 0, isNotificationEnabled: Bool = false, reminderNotificationDate: Date) {
-		print("AddItem")
 		withAnimation {
 			let newItem = Item(
 				title: title,
