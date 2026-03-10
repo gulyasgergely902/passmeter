@@ -88,8 +88,8 @@ struct ContentView: View {
 					}.presentationDetents([.large])
 				}
 				.sheet(item: $selectedItem) { selectedItem in
-					RenewPassView (item: selectedItem) { expiryDate, entryCount, isNotificationEnabled, reminderNotificationDate in
-						renewItem(itemToRenew: selectedItem, expiryDate: expiryDate, entryCount: entryCount, isNotificationEnabled: isNotificationEnabled, reminderNotificationDate: reminderNotificationDate)
+					RenewPassView (item: selectedItem) { startDate, expiryDate, entryCount, isNotificationEnabled, reminderNotificationDate in
+						renewItem(itemToRenew: selectedItem, startDate: startDate, expiryDate: expiryDate, entryCount: entryCount, isNotificationEnabled: isNotificationEnabled, reminderNotificationDate: reminderNotificationDate)
 					}.presentationDetents([.medium])
 				}
 				.sheet(item: $itemForDetails) { item in
@@ -133,9 +133,10 @@ struct ContentView: View {
 		}
 	}
 
-	private func renewItem(itemToRenew: Item, expiryDate: Date, entryCount: Int, isNotificationEnabled: Bool = false, reminderNotificationDate: Date) {
+	private func renewItem(itemToRenew: Item, startDate: Date, expiryDate: Date, entryCount: Int, isNotificationEnabled: Bool = false, reminderNotificationDate: Date) {
 		withAnimation{
 			NotificationManager.instance.cancelNotification(for: itemToRenew)
+			itemToRenew.startDate = startDate
 			itemToRenew.expiryDate = expiryDate
 			itemToRenew.totalEntries = entryCount
 			itemToRenew.remainingEntries = entryCount

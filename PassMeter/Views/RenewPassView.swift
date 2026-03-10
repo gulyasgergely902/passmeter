@@ -13,17 +13,19 @@ struct RenewPassView: View {
 
 	let item: Item
 
+	@State private var startDate: Date
 	@State private var expiryDate: Date
 	@State private var entryCount: Int
 	@State private var isNotificationEnabled: Bool = false
 	@State private var reminderNotificationDate: Date
 
-	var onSave: (Date, Int, Bool, Date) -> Void
+	var onSave: (Date, Date, Int, Bool, Date) -> Void
 
-	init(item: Item, onSave: @escaping (Date, Int, Bool, Date) -> Void) {
+	init(item: Item, onSave: @escaping (Date, Date, Int, Bool, Date) -> Void) {
 		self.item = item
 		self.onSave = onSave
 
+		_startDate = State(initialValue: Date.now)
 		_expiryDate = State(initialValue: item.expiryDate)
 		_entryCount = State(initialValue: item.totalEntries)
 		_isNotificationEnabled = State(initialValue: item.isNotificationEnabled)
@@ -101,7 +103,7 @@ struct RenewPassView: View {
 					Button {
 						let generator = UINotificationFeedbackGenerator()
 						generator.notificationOccurred(.success)
-						onSave(expiryDate, entryCount, isNotificationEnabled, reminderNotificationDate)
+						onSave(startDate, expiryDate, entryCount, isNotificationEnabled, reminderNotificationDate)
 						dismiss()
 					} label: {
 						Image(systemName: "checkmark")
