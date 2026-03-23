@@ -106,8 +106,14 @@ final class Item {
 	}
 
 	var statusText: String {
+		let calendar = Calendar.current
+
 		if isExpired {
 			return "Expired"
+		}
+
+		if calendar.isDateInToday(expiryDate) {
+			return "Expires Today"
 		}
 
 		return "Expires \(expiryDate.formatted(.relative(presentation: .named)))"
