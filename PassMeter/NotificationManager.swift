@@ -25,7 +25,7 @@ class NotificationManager {
 	func scheduleNotification(for item: Item, reminderDate: Date) {
 		let content = UNMutableNotificationContent()
 		content.title = "\(item.title) is expiring."
-		content.body = "Your pass '\(item.title)' is about to expire."
+		content.body = "Your pass will expire \(item.notificationStatusText)"
 		content.sound = .default
 
 		let calendar = Calendar.current

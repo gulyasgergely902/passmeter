@@ -119,6 +119,16 @@ final class Item {
 		return "Expires \(expiryDate.formatted(.relative(presentation: .named)))"
 	}
 
+	var notificationStatusText: String {
+		let calendar = Calendar.current
+
+		if calendar.isDateInToday(expiryDate) {
+			return "Today."
+		}
+
+		return "\(expiryDate.formatted(.relative(presentation: .named)))."
+	}
+
 	var entryCountText: String {
 		return "\(remainingEntries) entries left"
 	}
