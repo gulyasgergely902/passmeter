@@ -73,11 +73,13 @@ struct AddPassView: View {
 					Toggle("Limited Entries", isOn: $hasEntryLimit.animation(.spring()))
 
 					if hasEntryLimit {
-						Stepper(
-							"Total Entries: \(totalEntries)",
-							value: $totalEntries,
-							in: 1...100
-						)
+						Picker("Total Entries", selection: $totalEntries) {
+							ForEach(1...100, id: \.self) { number in
+								Text("\(number)").tag(number)
+							}
+						}
+						.pickerStyle(.wheel)
+						.frame(height: 120)
 						.transition(.move(edge: .top).combined(with: .opacity))
 						if item != nil {
 							Stepper(
@@ -162,4 +164,10 @@ struct AddPassView: View {
 			}
 		}
 	}
+}
+
+#Preview {
+	AddPassView(onSave: { _, _, _, _, _, _, _, _ in
+		// Do nothing for the preview
+	})
 }
