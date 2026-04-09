@@ -25,7 +25,7 @@ struct PassDetailsView: View {
 				) {
 					HStack(spacing: 2) {
 						Text(
-							Date.now.formatted(date: .long, time: .omitted)
+							item.startDate.formatted(date: .long, time: .omitted)
 						)
 
 						Spacer()
