@@ -21,42 +21,82 @@ struct ContentView: View {
 
 	@State private var confeTrigger = 0
 
+	var activePasses : [Item] {
+		items.filter { !$0.isExpired && !$0.isRunOutOfEntries }
+	}
+
+	var expiredPasses : [Item] {
+		items.filter { $0.isExpired || $0.isRunOutOfEntries }
+	}
+
 	var body: some View {
 		NavigationStack {
 			ZStack {
 				List {
-					ForEach(items) { item in
-						ListItem(item: item) { selectedItem in
-							itemToCheckIn = selectedItem
-							isShowingConfirm = true
-						}
-						.swipeActions(edge: .trailing, allowsFullSwipe: false) {
-							Button {
-								selectedItem = item
-							} label: {
-								Label("Renew", systemImage: "arrow.clockwise")
-							}
-							.tint(.yellow)
-
-							Button {
-								deleteItems(item)
-							} label: {
-								Label("Delete", systemImage: "trash")
-							}
-							.tint(.red)
-						}
-						.swipeActions(edge: .leading, allowsFullSwipe: false) {
-							if item.hasEntryLimit && item.remainingEntries > 0 {
-								Button {
-									useEntry(for: item)
-								} label: {
-									Label("Check In", systemImage: "checkmark.circle.fill")
+					if (!activePasses.isEmpty) {
+						Section(header: Text("Active")) {
+							ForEach(activePasses) { item in
+								ListItem(item: item) { selectedItem in
+									itemToCheckIn = selectedItem
+									isShowingConfirm = true
 								}
-								.tint(.blue)
+								.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+									Button {
+										selectedItem = item
+									} label: {
+										Label("Renew", systemImage: "arrow.clockwise")
+									}
+									.tint(.yellow)
+
+									Button {
+										deleteItems(item)
+									} label: {
+										Label("Delete", systemImage: "trash")
+									}
+									.tint(.red)
+								}
+								.swipeActions(edge: .leading, allowsFullSwipe: false) {
+									if item.hasEntryLimit && item.remainingEntries > 0 {
+										Button {
+											useEntry(for: item)
+										} label: {
+											Label("Check In", systemImage: "checkmark.circle.fill")
+										}
+										.tint(.blue)
+									}
+								}
+								.onTapGesture {
+									itemForDetails = item
+								}
 							}
 						}
-						.onTapGesture {
-							itemForDetails = item
+					}
+					if (!expiredPasses.isEmpty) {
+						Section(header: Text("Expired")) {
+							ForEach(expiredPasses) { item in
+								ListItem(item: item) { selectedItem in
+									itemToCheckIn = selectedItem
+									isShowingConfirm = true
+								}
+								.swipeActions(edge: .trailing, allowsFullSwipe: false) {
+									Button {
+										selectedItem = item
+									} label: {
+										Label("Renew", systemImage: "arrow.clockwise")
+									}
+									.tint(.yellow)
+
+									Button {
+										deleteItems(item)
+									} label: {
+										Label("Delete", systemImage: "trash")
+									}
+									.tint(.red)
+								}
+								.onTapGesture {
+									itemForDetails = item
+								}
+							}
 						}
 					}
 				}

@@ -122,8 +122,12 @@ final class Item {
 	var notificationStatusText: String {
 		let calendar = Calendar.current
 
+		if calendar.compare(expiryDate, to: Date(), toGranularity: .day) == .orderedAscending {
+			return "Your pass is expired. It is time to renew!"
+		}
+
 		if calendar.isDateInToday(expiryDate) {
-			return "Today."
+			return "Your pass will expire today!"
 		}
 
 		return "\(expiryDate.formatted(.relative(presentation: .named)))."

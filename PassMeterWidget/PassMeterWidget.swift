@@ -33,17 +33,17 @@ struct WidgetItemsList: TimelineEntry {
 
 let mockWidget = WidgetItem(
 	date: .now,
-	title: "N/A",
+	title: "Sample Pass",
 	expiryDate: .distantFuture,
-	progress: 0.0,
+	progress: 0.32,
 	isExpired: false,
-	progressColor: .gray,
-	statusText: "N/A",
+	progressColor: .orange,
+	statusText: "Expires next week",
 	textColor: .gray,
-	hasEntryLimit: false,
-	entryProgress: 0.0,
-	entryProgressColor: .gray,
-	entryCountText: "N/A",
+	hasEntryLimit: true,
+	entryProgress: 0.5,
+	entryProgressColor: .green,
+	entryCountText: "3 entries left",
 	isNotificationEnabled: true
 )
 
@@ -150,21 +150,15 @@ struct SmallWidgetView: View {
 					.fontWeight(.bold)
 					.lineLimit(2)
 
-				HStack(spacing: 2) {
-					Text(item.statusText)
+				Text(item.statusText)
+					.foregroundColor(item.textColor)
+					.font(.system(.subheadline, design: .rounded))
+					.foregroundStyle(.secondary)
+				if item.hasEntryLimit {
+					Text(item.entryCountText)
 						.foregroundColor(item.textColor)
 						.font(.system(.subheadline, design: .rounded))
 						.foregroundStyle(.secondary)
-					if item.hasEntryLimit {
-						Text("•")
-							.foregroundColor(item.textColor)
-							.font(.system(.subheadline, design: .rounded))
-							.foregroundStyle(.secondary)
-						Text(item.entryCountText)
-							.foregroundColor(item.textColor)
-							.font(.system(.subheadline, design: .rounded))
-							.foregroundStyle(.secondary)
-					}
 				}
 				HStack(spacing: 2) {
 					Text(item.expiryDate.formatted(date: .abbreviated, time: .omitted))
@@ -190,13 +184,13 @@ struct SmallWidgetView: View {
 				Spacer()
 				ZStack {
 					Circle()
-						.stroke(Color.secondary.opacity(0.2), lineWidth: 14)
+						.stroke(Color.secondary.opacity(0.2), lineWidth: 12)
 
 					Circle()
 						.trim(from: 0, to: item.progress)
 						.stroke(
 							item.progressColor,
-							style: StrokeStyle(lineWidth: 14, lineCap: .round)
+							style: StrokeStyle(lineWidth: 12, lineCap: .round)
 						)
 						.rotationEffect(.degrees(-90))
 					if item.hasEntryLimit {
@@ -214,7 +208,7 @@ struct SmallWidgetView: View {
 							.rotationEffect(.degrees(-90))
 					}
 				}
-			.frame(width: 55, height: 55)
+			.frame(width: 40, height: 40)
 			}
 		}.containerBackground(.fill.tertiary, for: .widget)
 	}
@@ -349,4 +343,16 @@ struct PassMeterWidget: Widget {
 			.systemMedium
 		])
 	}
+}
+
+#Preview("Small Mock", as: .systemSmall) {
+	PassMeterWidget()
+} timeline: {
+	Provider.Entry(date: .now, items: [mockWidget])
+}
+
+#Preview("Medium Mock", as: .systemMedium) {
+	PassMeterWidget()
+} timeline: {
+	Provider.Entry(date: .now, items: [mockWidget, mockWidget])
 }
