@@ -56,7 +56,7 @@ struct PassDetailsView: View {
 						ForEach(item.sortedEntries, id: \.self) { entry in
 							HStack {
 								Image(systemName: "calendar.badge.checkmark")
-								Text(entry.formatted(date: .abbreviated, time: .shortened))
+								Text(entry.formatted(date: .abbreviated, time: .omitted))
 							}
 						}
 					}

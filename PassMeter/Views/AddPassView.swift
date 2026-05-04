@@ -134,6 +134,7 @@ struct AddPassView: View {
 					reminderNotificationDate = item.reminderNotificationDate
 				} else {
 					remainingEntries = totalEntries
+					reminderNotificationDate = expiryDate
 				}
 			}
 			.navigationTitle(item == nil ? "New Pass" : "Edit Pass")
